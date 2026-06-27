@@ -1,62 +1,76 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
-    <!-- 移动端适配 -->
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>rickroll</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        html, body {
-            width: 100%;
-            height: 100%;
-            overflow: hidden; /* 隐藏滚动条 */
-        }
-        /* 全屏视频容器 */
-        .video-wrap {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            z-index: -1; /* 放在页面底层 */
-        }
-        video {
-            width: 100%;
-            height: 100%;
-            object-fit: cover; /* 铺满屏幕，裁剪多余部分无黑边 */
-        }
-        /* 音量控制按钮 */
-        .volume-btn {
-            position: fixed;
-            bottom: 30px;
-            left: 50%;
-            transform: translateX(-50%);
-            padding: 12px 24px;
-            font-size: 16px;
-            background: rgba(0,0,0,0.5);
-            color: #fff;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-        }
-        .volume-btn:hover {
-            background: rgba(0,0,0,0.7);
-        }
-    </style>
+  <meta charset="UTF-8">
+  <!-- WebView&移动端必须配置 -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Rickroll全屏视频</title>
+  <style>
+    * {margin:0;padding:0;box-sizing:border-box}
+    html,body {width:100vw;height:100vh;overflow:hidden}
+    /* 全屏视频底层容器 */
+    .video-box {
+      position:fixed;
+      inset:0;
+      width:100%;
+      height:100%;
+      z-index:-1;
+    }
+    video {
+      width:100%;
+      height:100%;
+      object-fit:cover; /* 铺满无黑边不变形 */
+      display:block;
+    }
+    /* 解锁音量按钮 */
+    .audio-btn {
+      position:fixed;
+      left:50%;
+      bottom:60px;
+      transform:translateX(-50%);
+      padding:14px 32px;
+      font-size:18px;
+      background:rgba(0,0,0,0.6);
+      color:#fff;
+      border:1px solid #fff;
+      border-radius:99px;
+      cursor:pointer;
+      z-index:999;
+    }
+    .audio-btn:hover {background:rgba(0,0,0,0.8)}
+  </style>
 </head>
 <body>
-    <!-- 全屏视频 -->
-    <div class="video-wrap">
-        <video id="bgVideo" autoplay loop volume="1">
-            <!-- 替换成你的视频地址，支持mp4/webm -->
-            <source src="http://github.com/Ruyue713/embedded-webview-rickroll/releases/download/default/rickroll.mp4" type="video/mp4">
-        </video>
-    </div>
-  
+  <div class="video-box">
+    <!-- muted先静音保证自动播放，volume=1预设最大音量 -->
+    <video id="video" autoplay loop muted volume="1" playsinline webkit-playsinline>
+      <!-- 替换rickroll视频地址，本地/CDN均可 -->
+      <source src="rickroll.mp4" type="video/mp4">
+      浏览器不支持视频
+    </video>
+  </div>
+
+  <button class="audio-btn" id="unmuteBtn">点击开启100%音量</button>
+
+  <script>
+    const video = document.getElementById('video');
+    const btn = document.getElementById('unmuteBtn');
+    // 预设音量100%
+    video.volume = 1;
+
+    // 用户点击交互解除静音，浏览器允许发声
+    btn.addEventListener('click', ()=>{
+      video.muted = false;
+      btn.style.display = 'none';
+    })
+
+    // WebView兼容：任意页面点击都解锁音量（兜底）
+    document.addEventListener('click', ()=>{
+      if(video.muted){
+        video.muted = false;
+        btn.style.display = 'none';
+      }
+    }, {once:true})
+  </script>
 </body>
 </html>
